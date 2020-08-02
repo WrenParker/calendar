@@ -1,0 +1,41 @@
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 2fr;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5%;
+  height: 100%;
+}
+
+.number {
+  position: relative;
+  height: 100%;
+  margin: 3px;
+}
+
+.event {
+  position: relative;
+  top: -1px;
+  font-size: smaller;
+  border-radius: 15%;
+  background-color: lightblue;
+  width: 90%;
+  margin: 1px;
+  text-align: right;
+}
+
+#events {
+  position: relative;
+}
+
+.event-wrapper {
+  position: relative;
+  display:flex;
+  justify-content: center;
+}
+
+.text {
+  margin-right: 4px;
+}
