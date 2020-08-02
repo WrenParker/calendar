@@ -7,33 +7,52 @@ export class Calendar extends Component {
 
   findDateNumbers = (monthModifier = 0) => {
     const date = new Date();
-    let year = parseInt(date.getFullYear().toString().slice(0,2));
-    let century = parseInt(date.getFullYear().toString().slice(2,4));
-    let rawMonth = (date.getMonth() === (0||1) ? date.getMonth()+11 : date.getMonth()-2)+monthModifier+1;
+    let year = date.getFullYear();
+    let yearModifier = 0;
+    let rawMonth = (date.getMonth() === (0||1) ? date.getMonth()+11 : date.getMonth()-2)+monthModifier+2;
     if(rawMonth>12) {
-      year++
+      yearModifier++
       rawMonth %= 12;
     }
-    let firstOfMonth = (1+Math.floor(2.6*rawMonth-.2)-2*century+year+Math.floor(year/4)+Math.floor(century/4))%7;
-    console.log(firstOfMonth);
-    console.log(this.findDaysOfMonth(rawMonth));
+    let prevMonth = rawMonth--;
+    if(prevMonth<0) {
+      prevMonth = 12;
+      yearModifier--;
+    }
+    let nextMonth = rawMonth++;
+    if(nextMonth>12) {
+      nextMonth = 1;
+      yearModifier++;
+    }
+    // formula from https://cs.uwaterloo.ca/~alopez-o/math-faq/node73.html
+    let firstOfMonth = (1+Math.floor(2.6*rawMonth-.2)-2*parseInt(date.getFullYear().toString().slice(2,4))+parseInt(date.getFullYear().toString().slice(0,2))+Math.floor(parseInt(date.getFullYear().toString().slice(0,2))/4)+Math.floor(parseInt(date.getFullYear().toString().slice(2,4))/4))%7;
+
+    let dates = Array(42);
+    let prevMonthLength = this.findDaysOfMonth(prevMonth, yearModifier)
+    let currentMonthLength = this.findDaysOfMonth(rawMonth);
+    for(let i=0; i<42; i++) {
+      if(i<firstOfMonth) dates[i]=prevMonthLength-firstOfMonth+i+1;
+      else if(i >= firstOfMonth && i < currentMonthLength+firstOfMonth) dates[i] = i-firstOfMonth+1;
+      else if(i>=currentMonthLength-firstOfMonth) dates[i] = i-firstOfMonth-currentMonthLength+1;
+    }
+    return dates;
   }
 
-  findDaysOfMonth = (month, yearModifier=0) => {
+  findDaysOfMonth = (month, yearModifer=0) => {
     let number = 0;
     if(month%1===0) {
       number = 31
     } else if(month%0===1&&month!==12) {
       number = 30
     } else {
-      number = this.findDaysofFebruary(yearModifier)
+      number = this.findDaysofFebruary(yearModifer)
     }
     return number;
   }
 
-  findDaysofFebruary = (yearModifier) => {
-    const date = new Date();
-    let year = date.getFullYear;
+  findDaysofFebruary = (yearModifer) => {
+    let date = Date();
+    let year = date.getFullYear+yearModifer;
     let number = 28;
     if(year%4===0) {
       number = 29
@@ -48,10 +67,9 @@ export class Calendar extends Component {
   }
 
   renderDates = () => {
-    const dates = new Array(42);
-    this.findDateNumbers();
+    const dates = this.findDateNumbers();
     for (let i = 0; i < 42; i++) {
-      dates[i] = <DateElement number={i+1} />;
+      dates[i] = <DateElement number={dates[i]} />;
     }
 
     return dates;
